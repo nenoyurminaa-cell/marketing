@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAK AI — Content & Marketing Strategist Platform</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="brand-header">
+        <div class="brand-logo">CAK</div>
+        <div class="brand-title">
+          <h1>CAK AI</h1>
+          <p>Powered by Google Gemini</p>
+        </div>
+      </div>
+
+      <div class="section-label">Brand Switcher</div>
+      <div class="brand-list" id="brand-list-container">
+        <!-- Rendered by JS -->
+      </div>
+
+      <button class="add-brand-btn" id="btn-add-brand-modal">
+        <span>+</span> Tambah Brand Baru
+      </button>
+
+      <div class="section-label">Platform Layers</div>
+      <nav class="nav-menu">
+        <a class="nav-link active" data-screen="dashboard">
+          <span>📊</span> Dashboard
+        </a>
+        <a class="nav-link" data-screen="brief">
+          <span>📄</span> Brief Intake
+          <span class="nav-status status-confirmed">Phase 3</span>
+        </a>
+        <a class="nav-link" data-screen="strategy">
+          <span>🎯</span> Strategy Workspace
+          <span class="nav-status status-approved">Phase 4</span>
+        </a>
+        <a class="nav-link" data-screen="content">
+          <span>📅</span> Content Calendar
+          <span class="nav-status status-draft">Phase 5</span>
+        </a>
+        <a class="nav-link" data-screen="report">
+          <span>⚡</span> Report Generator
+          <span class="nav-status status-confirmed" style="background: rgba(16, 185, 129, 0.3); color:#34d399;">PHASE 1 (TOP)</span>
+        </a>
+        
+        <div style="margin: 16px 0 8px 0; border-top: 1px solid var(--border-glass);"></div>
+        
+        <!-- DEDICATED SETTINGS MENU ITEM -->
+        <a class="nav-link" data-screen="settings" id="nav-settings-link" style="border: 1px solid rgba(59, 130, 246, 0.25); background: rgba(59, 130, 246, 0.05);">
+          <span>⚙️</span> Pengaturan API
+          <span class="badge-pill badge-blue" id="sidebar-gemini-status-badge" style="font-size: 10px;">Gemini</span>
+        </a>
+      </nav>
+    </aside>
+
+    <!-- MAIN WORKSPACE CONTENT -->
+    <main class="main-content">
+      
+      <!-- TOP BAR -->
+      <div class="top-bar">
+        <div class="page-title">
+          <h2>CAK Content & Marketing Strategist Platform</h2>
+          <p>Multi-Brand Automation Engine with Google Gemini API</p>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 16px;">
+          <!-- Gemini API Quick Button -->
+          <button class="btn btn-secondary" onclick="document.querySelector('[data-screen=\'settings\']').click();" style="display: flex; align-items: center; gap: 8px; border-color: rgba(59, 130, 246, 0.4); background: rgba(59, 130, 246, 0.1);">
+            <span id="gemini-status-dot" style="width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 8px #10b981;"></span>
+            <span id="gemini-status-text" style="font-size: 13px; font-weight: 700; color: #93c5fa;">Gemini API: Ready</span>
+            <span style="font-size: 11px; opacity: 0.7;">⚙️</span>
+          </button>
+
+          <div class="active-brand-banner">
+            <div class="active-brand-badge" id="active-brand-badge"></div>
+            <div>
+              <div style="font-size: 11px; color: var(--text-dim); font-weight:700; text-transform: uppercase;">Active Brand Workspace</div>
+              <div style="font-size: 14px; font-weight: 800; color: var(--text-main);" id="active-brand-name">UGREEN Indonesia</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 1: DASHBOARD -->
+      <!-- ============================================================== -->
+      <section id="screen-dashboard" class="workspace-screen">
+        
+        <!-- Action Notification Banner -->
+        <div class="action-banner">
+          <div class="action-info">
+            <div class="action-icon">✨</div>
+            <div>
+              <strong style="font-size: 15px; color: var(--accent-amber);">Gemini AI Pipeline Active</strong>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 2px;">
+                Semua agent (Brief Extractor, SWOT Research, Content Breakdown & Report Narrative) terhubung langsung ke <strong style="color:#60a5fa;">Google Gemini API</strong>.
+              </p>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="document.querySelector('[data-screen=\'report\']').click();" style="background: var(--accent-green); color: black;">
+            Buka Report Generator (Phase 1) →
+          </button>
+        </div>
+
+        <!-- KPI Summary Cards -->
+        <div class="grid-4" style="margin-bottom: 32px;">
+          <div class="kpi-card">
+            <div class="kpi-title">Total Active Brands</div>
+            <div class="kpi-value" id="kpi-total-brands">6</div>
+            <div class="kpi-sub">✓ Multi-brand Architecture</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">AI Engine</div>
+            <div class="kpi-value" style="color: var(--accent-blue);" id="kpi-gemini-model">Gemini 1.5 Flash</div>
+            <div class="kpi-sub">Google Gemini API Connected</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Monthly Total Views</div>
+            <div class="kpi-value" style="color: var(--accent-purple);">78.0K</div>
+            <div class="kpi-sub">Across All Client Accounts</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Time Saved / Report</div>
+            <div class="kpi-value" style="color: var(--accent-amber);">~4 Jam</div>
+            <div class="kpi-sub">Auto Export Excel & PPT</div>
+          </div>
+        </div>
+
+        <!-- Brand Status Overview Grid -->
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>🏢 Status Brand Client CAK AI</h3>
+            <span style="font-size: 13px; color: var(--text-muted);">Pilih brand untuk masuk ke workspace spesifik</span>
+          </div>
+          <div class="grid-2" id="dashboard-brand-grid">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 2: BRIEF INTAKE (PHASE 3) -->
+      <!-- ============================================================== -->
+      <section id="screen-brief" class="workspace-screen hidden">
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>📄 Brief Intake Engine (Gemini AI Extractor)</h3>
+            <span class="badge-pill status-confirmed">Layer 1</span>
+          </div>
+
+          <div class="dropzone" id="brief-dropzone">
+            <div class="dropzone-icon">📥</div>
+            <h4>Input / Upload Brief Client</h4>
+            <p style="color: var(--text-muted); font-size: 13px; margin-top: 4px;">
+              Klik untuk mengetikkan atau menempelkan brief client, lalu biarkan Gemini AI mengekstrak data penting secara otomatis.
+            </p>
+          </div>
+
+          <div style="margin-top: 24px; display: flex; justify-content: flex-end;">
+            <button class="btn btn-purple" id="btn-ai-extract-brief">
+              ✨ Ekstrak Brief dengan Gemini AI
+            </button>
+          </div>
+
+          <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-glass);">
+            <h4 style="font-size: 16px; font-weight:700; margin-bottom: 16px;">Hasil AI Extraction (Human Review Gate)</h4>
+            
+            <div class="grid-2">
+              <div class="form-group">
+                <label class="form-label">Brand Name</label>
+                <input type="text" class="form-control" id="brief-brand-name" value="UGREEN Indonesia">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Deadline Kampanye</label>
+                <input type="text" class="form-control" value="31 Agustus 2026">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Goals / Target Utama</label>
+              <textarea class="form-control" id="brief-goals"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Problem Statement</label>
+              <textarea class="form-control" id="brief-problem"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Target Audience Segment</label>
+              <input type="text" class="form-control" id="brief-audience">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Extracted Product Knowledge</label>
+              <div id="brief-product-knowledge"></div>
+            </div>
+
+            <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+              <button class="btn btn-secondary">Simpan Sebagai Draft</button>
+              <button class="btn btn-primary" id="btn-confirm-brief">
+                ✓ Confirm Brief & Lanjut ke Strategy Layer
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 3: STRATEGY WORKSPACE (PHASE 4) -->
+      <!-- ============================================================== -->
+      <section id="screen-strategy" class="workspace-screen hidden">
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>🎯 Strategy Workspace & Persona Planning</h3>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-purple" id="btn-ai-generate-swot" style="padding: 6px 14px; font-size: 13px;">
+                ✨ Auto-Generate SWOT with Gemini
+              </button>
+            </div>
+          </div>
+
+          <!-- SWOT 4 Columns Grid -->
+          <h4 style="font-size: 16px; font-weight:700; margin-bottom: 16px;">Analisis SWOT & Insight Kompetitor</h4>
+          <div class="swot-grid" style="margin-bottom: 24px;">
+            <div class="swot-card swot-s">
+              <h4 style="color: var(--accent-green);">💪 Strengths</h4>
+              <textarea class="form-control" id="swot-strengths" style="background:transparent; border:none;"></textarea>
+            </div>
+            <div class="swot-card swot-w">
+              <h4 style="color: #ef4444;">⚠️ Weaknesses</h4>
+              <textarea class="form-control" id="swot-weaknesses" style="background:transparent; border:none;"></textarea>
+            </div>
+            <div class="swot-card swot-o">
+              <h4 style="color: var(--accent-blue);">🚀 Opportunities</h4>
+              <textarea class="form-control" id="swot-opportunities" style="background:transparent; border:none;"></textarea>
+            </div>
+            <div class="swot-card swot-t">
+              <h4 style="color: var(--accent-amber);">🛡️ Threats</h4>
+              <textarea class="form-control" id="swot-threats" style="background:transparent; border:none;"></textarea>
+            </div>
+          </div>
+
+          <!-- Competitors & AI Research Button -->
+          <div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: var(--radius-md); margin-bottom: 32px; border: 1px solid var(--border-glass);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+              <h4 style="font-size: 15px; font-weight: 700;">🥊 Riset Kompetitor Brand</h4>
+              <button class="btn btn-purple" id="btn-ai-competitor" style="padding: 6px 14px; font-size: 12px;">
+                ✨ Research Competitors with Gemini AI
+              </button>
+            </div>
+            <div id="competitor-list"></div>
+          </div>
+
+          <!-- Persona Plan Table -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="font-size: 16px; font-weight:700;">Persona Plan & Kuota Konten / Bulan</h4>
+            <div style="display: flex; gap: 8px;">
+              <button class="btn btn-purple" id="btn-ai-generate-personas" style="padding: 6px 12px; font-size: 12px;">
+                ✨ Auto-Generate Personas with Gemini
+              </button>
+              <button class="btn btn-secondary" id="btn-add-persona" style="padding: 6px 12px; font-size: 12px;">
+                + Tambah Manual
+              </button>
+            </div>
+          </div>
+          
+          <div class="table-responsive" style="margin-bottom: 32px;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Nama Persona</th>
+                  <th>Kategori</th>
+                  <th>Quantity / Bulan</th>
+                  <th>Strategic Reasoning</th>
+                </tr>
+              </thead>
+              <tbody id="persona-table-body">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Style Reference Analyzer -->
+          <h4 style="font-size: 16px; font-weight:700; margin-bottom: 16px;">Style Reference Analyzer</h4>
+          <div class="glass-card" style="background: rgba(15,23,42,0.4);">
+            <div class="form-group">
+              <label class="form-label">Submit Link Referensi Konten (TikTok / Instagram URL)</label>
+              <div style="display: flex; gap: 12px;">
+                <input type="text" class="form-control" id="input-style-url" value="https://tiktok.com/@tech_unboxing_aesthetic/123" placeholder="https://...">
+                <button class="btn btn-purple" id="btn-analyze-style">✨ Analyze with Gemini</button>
+              </div>
+            </div>
+            <div id="style-ref-card" style="margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.03); border-radius: var(--radius-md);"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 4: CONTENT CALENDAR (PHASE 5) -->
+      <!-- ============================================================== -->
+      <section id="screen-content" class="workspace-screen hidden">
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>📅 Content Breakdown & Interactive Calendar</h3>
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-purple" id="btn-trigger-breakdown">
+                ✨ Generate 30-Day Hooks with Gemini AI
+              </button>
+              <button class="btn btn-secondary" id="btn-export-copywriter">
+                📤 Export ke Tim Produksi (Copywriter & Editor)
+              </button>
+            </div>
+          </div>
+
+          <div class="calendar-header">
+            <h4 style="font-size: 18px; font-weight: 700;">Agustus 2026 — Calendar Breakdown</h4>
+            <div style="display: flex; gap: 12px; font-size: 13px; align-items: center;">
+              <span class="badge-pill badge-blue">Interactive Calendar Grid</span>
+            </div>
+          </div>
+
+          <div class="calendar-grid">
+            <div class="calendar-day-head">Minggu</div>
+            <div class="calendar-day-head">Senin</div>
+            <div class="calendar-day-head">Selasa</div>
+            <div class="calendar-day-head">Rabu</div>
+            <div class="calendar-day-head">Kamis</div>
+            <div class="calendar-day-head">Jumat</div>
+            <div class="calendar-day-head">Sabtu</div>
+          </div>
+
+          <div class="calendar-grid" id="calendar-grid-cells" style="margin-top: 8px;">
+            <!-- Rendered by JS -->
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 5: REPORT GENERATOR (PRIORITY PHASE 1) -->
+      <!-- ============================================================== -->
+      <section id="screen-report" class="workspace-screen hidden">
+        
+        <!-- Header Banner -->
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(16, 185, 129, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%); border-color: rgba(16, 185, 129, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 12px; font-weight:700; color: var(--accent-green); text-transform: uppercase;">PHASE 1 HIGHEST PRIORITY PIPELINE</div>
+              <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">Automated Report Generator Engine</h3>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                Menggabungkan Raw Scrape CSV + Follower Snapshots → Metrics Aggregator → Report Narrative Agent (Powered by Gemini) → Export Excel & PPT.
+              </p>
+            </div>
+
+            <div style="display: flex; gap: 12px;">
+              <button class="btn btn-secondary" id="btn-export-excel">
+                📗 Export Excel (.csv)
+              </button>
+
+              <button class="btn btn-primary" id="btn-export-ppt">
+                📙 Export PPT Presentation (.pptx)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Scrape CSV Data Import Toolbar -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h4 style="font-size: 16px; font-weight: 700;">📂 Raw Scrape Data Source (CSV & Snapshots)</h4>
+              <p style="font-size: 12px; color: var(--text-muted);">Impor CSV hasil scraping TikTok & IG post level.</p>
+            </div>
+            
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <label class="btn btn-secondary" style="cursor: pointer;">
+                📥 Import Raw Scrape CSV
+                <input type="file" id="csv-file-input" accept=".csv" style="display: none;">
+              </label>
+              <button class="btn btn-purple" id="btn-generate-narrative" style="padding: 10px 16px;">
+                ✨ Generate AI Narrative (Gemini)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Metrics Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; margin-bottom: 24px;">
+          <div class="kpi-card">
+            <div class="kpi-title">Total Accumulated Views</div>
+            <div class="kpi-value" id="rep-total-views" style="color: var(--accent-green);">0</div>
+            <div class="kpi-sub">Across Scraped Content</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Filtered Average ER%</div>
+            <div class="kpi-value" id="rep-avg-er" style="color: var(--accent-blue);">0.00%</div>
+            <div class="kpi-sub">(L+C+Saves+Shares)/Views</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Bookmark / Saves</div>
+            <div class="kpi-value" id="rep-total-saves" style="color: var(--accent-purple);">0</div>
+            <div class="kpi-sub">Retention Signals</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Content Shares</div>
+            <div class="kpi-value" id="rep-total-shares" style="color: var(--accent-pink);">0</div>
+            <div class="kpi-sub">Virality Signals</div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-title">Total Tracked Posts</div>
+            <div class="kpi-value" id="rep-total-posts">0</div>
+            <div class="kpi-sub">TikTok & Instagram</div>
+          </div>
+        </div>
+
+        <!-- Top Performers Tables Grid -->
+        <div class="grid-2">
+          <!-- Top 3 by ER% -->
+          <div class="glass-card">
+            <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--accent-green);">
+              🏆 Top 3 Content Performers (By ER%)
+            </h4>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Judul Template</th>
+                    <th>ER %</th>
+                    <th>Saves</th>
+                    <th>Shares</th>
+                  </tr>
+                </thead>
+                <tbody id="table-top-er">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Top 3 by Views -->
+          <div class="glass-card">
+            <h4 style="font-size: 15px; font-weight: 700; margin-bottom: 16px; color: var(--accent-blue);">
+              🚀 Top 3 Content Performers (By Views)
+            </h4>
+            <div class="table-responsive">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Judul Template</th>
+                    <th>Views</th>
+                    <th>Likes</th>
+                    <th>ER %</th>
+                  </tr>
+                </thead>
+                <tbody id="table-top-views">
+                  <!-- Rendered by JS -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Follower Snapshot Growth Table (Phase 2 Automation) -->
+        <div class="glass-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+            <h4 style="font-size: 15px; font-weight: 700;">
+              📈 Follower Snapshots Growth Delta (Phase 2 Automation)
+            </h4>
+            <button class="btn btn-secondary" id="btn-add-snapshot" style="padding: 6px 12px; font-size: 12px;">
+              + Update Snapshot Mingguan
+            </button>
+          </div>
+          
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Akun Brand</th>
+                  <th>Snapshot Minggu Lalu</th>
+                  <th>Snapshot Minggu Ini</th>
+                  <th>Pertumbuhan (Delta)</th>
+                  <th>% Growth</th>
+                </tr>
+              </thead>
+              <tbody id="table-follower-growth">
+                <!-- Rendered by JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Report Narrative Agent Editor (Human Approval Gate) -->
+        <div class="glass-card" style="border: 2px solid rgba(245, 158, 11, 0.4);">
+          <div class="card-header-title">
+            <h3 style="color: var(--accent-amber);">✍️ Report Narrative Agent — Human Approval Gate</h3>
+            <span class="badge-pill status-review">Strategist Review Mandatory</span>
+          </div>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 20px;">
+            Narasi di bawah ini disusun otomatis oleh <strong>Google Gemini API</strong> berdasarkan angka performa di atas. Strategist wajib mereview/mengedit narasi ini sebelum diexport ke client.
+          </p>
+
+          <div class="form-group">
+            <label class="form-label">1. Campaign Overview Narrative</label>
+            <textarea class="form-control" id="narrative-overview-text" rows="6"></textarea>
+          </div>
+
+          <div class="form-group" style="margin-top: 20px;">
+            <label class="form-label">2. Strategic Conclusion & Next Steps Recommendations</label>
+            <textarea class="form-control" id="narrative-conclusion-text" rows="6"></textarea>
+          </div>
+
+          <div style="display: flex; justify-content: flex-end; gap: 12px; margin-top: 24px;">
+            <button class="btn btn-primary" id="btn-approve-narrative" style="background: var(--accent-amber); color: black;">
+              ✓ Approve Narasi Laporan
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ============================================================== -->
+      <!-- SCREEN 6: DEDICATED SETTINGS & API KEY PAGE -->
+      <!-- ============================================================== -->
+      <section id="screen-settings" class="workspace-screen hidden">
+        
+        <!-- Header Banner -->
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(15, 23, 42, 0.8) 100%); border-color: rgba(59, 130, 246, 0.3);">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <div style="font-size: 12px; font-weight:700; color: #60a5fa; text-transform: uppercase;">CONFIGURATION CENTER</div>
+              <h3 style="font-size: 24px; font-weight: 800; margin-top: 4px;">⚙️ Pengaturan Google Gemini API</h3>
+              <p style="color: var(--text-muted); font-size: 14px; margin-top: 4px;">
+                Atur API Key, pilih model reasoning AI, dan uji konektivitas seluruh agent CAK AI secara langsung.
+              </p>
+            </div>
+            <div>
+              <a href="https://aistudio.google.com/app/apikey" target="_blank" class="btn btn-primary" style="background: #2563eb; color: #fff; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;">
+                <span>🔑 Dapatkan API Key di Google AI Studio →</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- API Configuration Card -->
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>🔑 Kunci Google Gemini API</h3>
+            <span class="badge-pill badge-green" id="settings-conn-status">Siap Digunakan</span>
+          </div>
+
+          <div style="background: rgba(59, 130, 246, 0.08); padding: 16px; border-radius: var(--radius-md); border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 24px;">
+            <p style="font-size: 13px; color: #bfdbfe;">
+              💡 <strong>Cara Mendapatkan API Key:</strong> Kunjungi <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #fff; text-decoration: underline; font-weight: 700;">Google AI Studio API Key Page</a>, login dengan akun Gmail kamu, klik <strong>"Create API Key"</strong>, lalu paste kodenya ke kolom di bawah. Kunci disimpan 100% lokal dan aman di browser kamu.
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" style="display: flex; justify-content: space-between;">
+              <span>Google Gemini API Key</span>
+              <span style="font-size: 12px; color: var(--text-dim); cursor: pointer;" id="toggle-key-visibility">👁️ Lihat / Sembunyikan</span>
+            </label>
+            <div style="display: flex; gap: 12px;">
+              <input type="password" class="form-control" id="settings-input-key" placeholder="Paste kunci API di sini (contoh: AIzaSy...)" style="font-family: monospace; font-size: 14px;">
+              <button class="btn btn-purple" id="settings-btn-test" style="white-space: nowrap; padding: 0 20px;">
+                🔍 Test Koneksi
+              </button>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-top: 20px;">
+            <div class="form-group">
+              <label class="form-label">Pilih Model AI (Gemini)</label>
+              <select class="form-control" id="settings-select-model">
+                <option value="gemini-1.5-flash">Gemini 1.5 Flash (Super Cepat & Direkomendasikan)</option>
+                <option value="gemini-1.5-pro">Gemini 1.5 Pro (Deep Strategic Reasoning untuk Laporan Kompleks)</option>
+                <option value="gemini-2.0-flash">Gemini 2.0 Flash (Next-Gen High Performance)</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Temperature Reasoning AI</label>
+              <select class="form-control" id="settings-select-temp">
+                <option value="0.7">0.7 — Seimbang (Kreatif & Berorientasi Data / Default)</option>
+                <option value="0.3">0.3 — Lebih Konsisten & Presisi</option>
+                <option value="0.9">0.9 — Lebih Kreatif untuk Viral Hooks</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--border-glass);">
+            <button class="btn btn-secondary" id="settings-btn-clear" style="color: #ef4444; border-color: rgba(239, 68, 68, 0.3);">
+              🗑️ Hapus Kunci API
+            </button>
+            <button class="btn btn-primary" id="settings-btn-save" style="background: var(--accent-green); color: black; font-weight: 800; padding: 12px 24px;">
+              ✓ Simpan Pengaturan API
+            </button>
+          </div>
+        </div>
+
+        <!-- Integrated Agent Pipeline Overview -->
+        <div class="glass-card">
+          <div class="card-header-title">
+            <h3>🤖 Daftar Agent yang Ditenagai oleh Gemini API</h3>
+            <span style="font-size: 13px; color: var(--text-muted);">Status Integrasi Live</span>
+          </div>
+
+          <div class="grid-2">
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-green);">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--accent-green);">⚡ Report Narrative Agent (Phase 1)</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Menganalisis CSV Scrape, Views, Shares, Saves, & ER% untuk menyusun narasi eksekutif dan rekomendasi taktis.
+              </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-blue);">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--accent-blue);">📄 Brief Intake Extractor (Phase 3)</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Mengekstrak otomatis Goals, Problem Statement, Target Audience, dan Product Knowledge dari teks brief client.
+              </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-purple);">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--accent-purple);">🎯 Strategy & SWOT Agent (Phase 4)</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Menghasilkan analisis SWOT industri brand serta intelijen positioning kompetitor secara dinamis.
+              </p>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); padding: 16px; border-radius: var(--radius-md); border-left: 3px solid var(--accent-amber);">
+              <h4 style="font-size: 15px; font-weight: 700; color: var(--accent-amber);">📅 30-Day Content Breakdown Agent (Phase 5)</h4>
+              <p style="font-size: 13px; color: var(--text-muted); margin-top: 4px;">
+                Merancang ide hook harian, konsep visual/audio, persona target, dan angle copywriting untuk satu bulan penuh.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- MODAL CONTAINER FOR ITEM DETAIL & DIALOGS -->
+  <div id="modal-container" class="modal-overlay hidden">
+    <div class="modal-content" id="modal-content-body">
+      <!-- Dynamic modal content -->
+    </div>
+  </div>
+
+  <!-- TOAST NOTIFICATION CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

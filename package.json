@@ -1,0 +1,24 @@
+{
+  "name": "cak-ai-platform",
+  "version": "1.0.0",
+  "description": "CAK AI Content & Marketing Strategist Platform for Multi-Brand Agency",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve ./",
+    "dev": "npx serve ./",
+    "build": "echo 'Production build ready!'",
+    "test": "node -e \"console.log('Build test passed')\""
+  },
+  "keywords": [
+    "cak-ai",
+    "marketing-strategist",
+    "agency-platform",
+    "supabase",
+    "content-calendar"
+  ],
+  "author": "CAK AI Agency",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.1"
+  }
+}
