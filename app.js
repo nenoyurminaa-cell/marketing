@@ -6,10 +6,73 @@
 const GEMINI_CONFIG = {
   getApiKey: () => localStorage.getItem("cak_gemini_api_key") || "",
   setApiKey: (key) => localStorage.setItem("cak_gemini_api_key", key),
-  getModel: () => localStorage.getItem("cak_gemini_model") || "gemini-1.5-flash",
+  getModel: () => localStorage.getItem("cak_gemini_model") || "gemini-2.5-flash",
   setModel: (model) => localStorage.setItem("cak_gemini_model", model),
   getTemperature: () => parseFloat(localStorage.getItem("cak_gemini_temp") || "0.7"),
   setTemperature: (temp) => localStorage.setItem("cak_gemini_temp", temp)
+};
+
+// ============================================================================
+// 1.1 THEME MANAGER & DISPLAY SETTINGS
+// ============================================================================
+const THEME_CONFIG = {
+  getTheme: () => localStorage.getItem("cak_theme") || "modern",
+  setTheme: (themeName, showNotification = true) => {
+    document.documentElement.setAttribute("data-theme", themeName);
+    localStorage.setItem("cak_theme", themeName);
+
+    // Update Quick Select Dropdown in Topbar
+    const quickSelect = document.getElementById("quick-theme-select");
+    if (quickSelect) quickSelect.value = themeName;
+
+    // Update Theme Grid active state in Settings
+    document.querySelectorAll(".theme-card").forEach(card => {
+      if (card.getAttribute("data-theme-id") === themeName) {
+        card.classList.add("active");
+      } else {
+        card.classList.remove("active");
+      }
+    });
+
+    // Update Active Theme Pill
+    const pill = document.getElementById("active-theme-pill");
+    if (pill) {
+      const themeLabels = {
+        modern: "Tema: Modern 🚀",
+        minimalist: "Tema: Minimalist 🖤",
+        stylish: "Tema: Stylish 🔮",
+        basic: "Tema: Basic 💼",
+        cyberpunk: "Tema: Cyberpunk ⚡",
+        sunset: "Tema: Sunset 🌅",
+        light: "Tema: Light Mode ☀️"
+      };
+      pill.textContent = themeLabels[themeName] || `Tema: ${themeName}`;
+    }
+
+    if (showNotification) {
+      showToast(`Tema visual diubah ke ${themeName.toUpperCase()}!`, "🎨");
+    }
+  },
+  init: () => {
+    const savedTheme = THEME_CONFIG.getTheme();
+    THEME_CONFIG.setTheme(savedTheme, false);
+
+    // Listener for Quick Select in Topbar
+    const quickSelect = document.getElementById("quick-theme-select");
+    if (quickSelect) {
+      quickSelect.addEventListener("change", (e) => {
+        THEME_CONFIG.setTheme(e.target.value);
+      });
+    }
+
+    // Listener for Theme Cards in Settings
+    document.querySelectorAll(".theme-card").forEach(card => {
+      card.addEventListener("click", () => {
+        const themeId = card.getAttribute("data-theme-id");
+        if (themeId) THEME_CONFIG.setTheme(themeId);
+      });
+    });
+  }
 };
 
 async function callGeminiAPI(prompt, systemInstruction = "") {
@@ -67,7 +130,7 @@ async function callGeminiAPI(prompt, systemInstruction = "") {
 }
 
 // ============================================================================
-// 2. INITIAL DATA STORE & MOCK DATA
+// 2. INITIAL DATA STORE & MOCK DATA (WITH SOCIAL MEDIA FOLLOWERS)
 // ============================================================================
 const INITIAL_BRANDS = [
   {
@@ -75,6 +138,17 @@ const INITIAL_BRANDS = [
     name: "UGREEN",
     industry: "Consumer Electronics & Tech Accessories",
     logoBg: "#00B060",
+    handle: "@ugreen_indonesia",
+    followers: {
+      total: 284500,
+      formatted: "284.5K",
+      growth: "+14.2K",
+      growthPct: "+5.2%",
+      accounts: [
+        { platform: "TikTok", icon: "📱", handle: "@ugreen.id", start: 167800, current: 182000, growth: "+14.2K", growthPct: "+8.4%" },
+        { platform: "Instagram", icon: "📸", handle: "@ugreen.official", start: 97500, current: 102500, growth: "+5.0K", growthPct: "+5.1%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["murahan", "kw", "original garansi hilang"],
       hashtag_pillars: ["#UGREENIndonesia", "#TechEssentials", "#GaPakeRibet"],
@@ -87,6 +161,17 @@ const INITIAL_BRANDS = [
     name: "AceKid",
     industry: "Kids Toys & Educational Gear",
     logoBg: "#FF6B6B",
+    handle: "@acekid.official",
+    followers: {
+      total: 95800,
+      formatted: "95.8K",
+      growth: "+8.9K",
+      growthPct: "+10.2%",
+      accounts: [
+        { platform: "TikTok", icon: "📱", handle: "@acekid.toys", start: 54700, current: 61300, growth: "+6.6K", growthPct: "+12.1%" },
+        { platform: "Instagram", icon: "📸", handle: "@acekid.official", start: 32200, current: 34500, growth: "+2.3K", growthPct: "+6.8%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["sufor", "berbahaya", "obat"],
       hashtag_pillars: ["#AceKidPlay", "#MainanEdukasi", "#DuniaAnak"],
@@ -99,6 +184,17 @@ const INITIAL_BRANDS = [
     name: "Golden Rama",
     industry: "Travel & Leisure Agency",
     logoBg: "#F59E0B",
+    handle: "@goldenramatours",
+    followers: {
+      total: 148200,
+      formatted: "148.2K",
+      growth: "+7.5K",
+      growthPct: "+5.3%",
+      accounts: [
+        { platform: "Instagram", icon: "📸", handle: "@goldenramatours", start: 107500, current: 112000, growth: "+4.5K", growthPct: "+4.2%" },
+        { platform: "TikTok", icon: "📱", handle: "@goldenrama.travel", start: 31400, current: 36200, growth: "+4.8K", growthPct: "+15.4%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["batal gratis", "pasti berangkat 100%"],
       hashtag_pillars: ["#GoldenRamaTours", "#LiburanSeru", "#TravelWithUs"],
@@ -111,6 +207,17 @@ const INITIAL_BRANDS = [
     name: "Bareksa",
     industry: "Fintech & Investment Platform",
     logoBg: "#2563EB",
+    handle: "@bareksa_id",
+    followers: {
+      total: 520400,
+      formatted: "520.4K",
+      growth: "+19.1K",
+      growthPct: "+3.8%",
+      accounts: [
+        { platform: "Instagram", icon: "📸", handle: "@bareksa_id", start: 332400, current: 345000, growth: "+12.6K", growthPct: "+3.8%" },
+        { platform: "TikTok", icon: "📱", handle: "@bareksa.official", start: 159900, current: 175400, growth: "+15.5K", growthPct: "+9.7%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["pasti cuan 100%", "tanpa risiko", "pinjol"],
       hashtag_pillars: ["#BareksaInvestasi", "#CuanReksadana", "#CerdasFinansial"],
@@ -123,6 +230,17 @@ const INITIAL_BRANDS = [
     name: "Syailendra",
     industry: "Asset Management & Capital",
     logoBg: "#8B5CF6",
+    handle: "@syailendra.capital",
+    followers: {
+      total: 78600,
+      formatted: "78.6K",
+      growth: "+3.8K",
+      growthPct: "+5.1%",
+      accounts: [
+        { platform: "Instagram", icon: "📸", handle: "@syailendracapital", start: 54600, current: 56200, growth: "+1.6K", growthPct: "+2.9%" },
+        { platform: "TikTok", icon: "📱", handle: "@syailendra.invest", start: 20100, current: 22400, growth: "+2.3K", growthPct: "+11.3%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["skema ponzi", "dijamin kaya"],
       hashtag_pillars: ["#SyailendraCapital", "#WealthManagement", "#InvestasiJangkaPanjang"],
@@ -135,6 +253,17 @@ const INITIAL_BRANDS = [
     name: "Bellastories",
     industry: "Fashion & Lifestyle Brand",
     logoBg: "#EC4899",
+    handle: "@bellastories_id",
+    followers: {
+      total: 196300,
+      formatted: "196.3K",
+      growth: "+15.6K",
+      growthPct: "+8.6%",
+      accounts: [
+        { platform: "TikTok", icon: "📱", handle: "@bellastories.fit", start: 118400, current: 138000, growth: "+19.6K", growthPct: "+16.5%" },
+        { platform: "Instagram", icon: "📸", handle: "@bellastories", start: 54300, current: 58300, growth: "+4.0K", growthPct: "+7.2%" }
+      ]
+    },
     guidelines: {
       banned_terms: ["jelek", "diskon bohong"],
       hashtag_pillars: ["#BellaStoriesFit", "#OOTDIndo", "#StyleWithBella"],
@@ -462,39 +591,188 @@ Language: Bahasa Indonesia.`;
 }
 
 // ============================================================================
-// 5. DOCUMENT EXPORTER ENGINE (EXCEL & PPT)
+// 5. DOCUMENT EXPORTER ENGINE (EXCEL & NATIVE PPTX)
 // ============================================================================
 function exportToExcel(brandName, period, metricsData, postsList) {
-  let csvContent = "data:text/csv;charset=utf-8,";
+  let csvContent = "\uFEFF"; // UTF-8 BOM for Microsoft Excel compatibility
   
   csvContent += `CAK AI PERFORMANCE REPORT - ${brandName.toUpperCase()}\n`;
   csvContent += `Periode,${period}\n`;
   csvContent += `Generated At,${new Date().toLocaleDateString('id-ID')}\n\n`;
 
-  csvContent += `METRIK KINERJA UTAMA\n`;
-  csvContent += `Total Content Posts,${metricsData.totalPosts}\n`;
+  csvContent += `RINGKASAN METRIK UTAMA\n`;
+  csvContent += `Total Konten Dipantau,${metricsData.totalPosts}\n`;
   csvContent += `Total Views,${metricsData.totalViews}\n`;
   csvContent += `Total Likes,${metricsData.totalLikes}\n`;
   csvContent += `Total Comments,${metricsData.totalComments}\n`;
-  csvContent += `Total Saves,${metricsData.totalSaves}\n`;
-  csvContent += `Total Shares,${metricsData.totalShares}\n`;
-  csvContent += `Rata-rata ER (%) [(Likes+Comments+Saves+Shares)/Views*100],${metricsData.averageER}%\n`;
-  csvContent += `Video vs Carousel,${metricsData.videoCount} Videos / ${metricsData.carouselCount} Carousels\n\n`;
+  csvContent += `Total Saves / Bookmarks,${metricsData.totalSaves}\n`;
+  csvContent += `Total Shares,${metricsData.totalShares || 0}\n`;
+  csvContent += `Rata-rata Engagement Rate (ER%),${metricsData.averageER}%\n`;
+  csvContent += `Rincian Format,${metricsData.videoCount} Videos / ${metricsData.carouselCount} Carousels\n\n`;
 
-  csvContent += `DETAIL KONTEN (RAW SCRAPE DATA)\n`;
-  csvContent += `Posted At,Template Name,Template Mode,Platform,Account,Views,Likes,Comments,Saves,Shares,ER (%),Type,URL\n`;
+  csvContent += `DETAIL KONTEN & HASIL MONITORING (RAW DATA)\n`;
+  csvContent += `No,Judul / Hook Konten,Link Konten (URL),Platform,Akun Handle,Views,Engagement Rate (%),Likes,Comments,Saves,Shares,Format Konten,Tanggal Post\n`;
 
-  postsList.forEach(p => {
-    csvContent += `"${p.posted_at || ''}","${p.template_name || ''}","${p.template_mode || ''}","${p.platform || ''}","${p.account_username || ''}",${p.views},${p.likes},${p.comments},${p.saves},${p.shares || 0},${p.engagementRate}%,"${p.type}","${p.url || ''}"\n`;
+  postsList.forEach((p, idx) => {
+    const title = (p.template_name || p.title || `Konten #${idx + 1}`).replace(/"/g, '""');
+    const url = (p.url || '').replace(/"/g, '""');
+    const platform = (p.platform || 'TikTok').replace(/"/g, '""');
+    const account = (p.account_username || p.account || '').replace(/"/g, '""');
+    const views = p.views || 0;
+    const er = p.engagementRate || 0;
+    const likes = p.likes || 0;
+    const comments = p.comments || 0;
+    const saves = p.saves || 0;
+    const shares = p.shares || 0;
+    const format = (p.type || p.format || 'Video').replace(/"/g, '""');
+    const date = (p.posted_at || '').replace(/"/g, '""');
+
+    csvContent += `${idx + 1},"${title}","${url}","${platform}","${account}",${views},${er}%,${likes},${comments},${saves},${shares},"${format}","${date}"\n`;
   });
 
-  const encodedUri = encodeURI(csvContent);
+  const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
   const link = document.createElement("a");
-  link.setAttribute("href", encodedUri);
-  link.setAttribute("download", `Report_${brandName.replace(/\s+/g, '_')}_${period}.csv`);
+  link.href = URL.createObjectURL(blob);
+  link.download = `Laporan_Excel_${brandName.replace(/\s+/g, '_')}_${period.replace(/\s+/g, '_')}.csv`;
   document.body.appendChild(link);
   link.click();
   document.body.removeChild(link);
+}
+
+function exportToPPTX(brandName, period, metricsData, narrative, brand) {
+  if (typeof PptxGenJS === "undefined") {
+    const htmlContent = generatePPTSlidesHTML(brandName, period, metricsData, narrative);
+    const win = window.open("", "_blank");
+    win.document.write(htmlContent);
+    win.document.close();
+    return;
+  }
+
+  try {
+    const pptx = new PptxGenJS();
+    pptx.layout = 'LAYOUT_16x9';
+
+    // SLIDE 1: Title Slide (Dark Premium Theme)
+    const slide1 = pptx.addSlide();
+    slide1.background = { color: '0B0F19' };
+    slide1.addShape(pptx.ShapeType.rect, {
+      x: 0, y: 0, w: 10, h: 0.1, fill: { color: '10B981' }
+    });
+    slide1.addText("CAK AI PERFORMANCE REPORT", {
+      x: 0.8, y: 1.8, w: 8.4, h: 0.5,
+      fontSize: 16, color: '10B981', bold: true, fontFace: 'Arial'
+    });
+    slide1.addText(brandName.toUpperCase(), {
+      x: 0.8, y: 2.3, w: 8.4, h: 1.2,
+      fontSize: 38, color: 'FFFFFF', bold: true, fontFace: 'Arial'
+    });
+    slide1.addText(`Periode Evaluasi: ${period} | Akun: ${brand?.handle || '@brand'}`, {
+      x: 0.8, y: 3.6, w: 8.4, h: 0.5,
+      fontSize: 14, color: '9CA3AF', fontFace: 'Arial'
+    });
+
+    // SLIDE 2: KPI Scorecard
+    const slide2 = pptx.addSlide();
+    slide2.background = { color: '0B0F19' };
+    slide2.addText("EXECUTIVE KPI SUMMARY", {
+      x: 0.8, y: 0.5, w: 8.4, h: 0.4,
+      fontSize: 22, color: '10B981', bold: true
+    });
+    slide2.addText(`Agregasi metrik performa konten untuk ${brandName}`, {
+      x: 0.8, y: 0.9, w: 8.4, h: 0.3,
+      fontSize: 12, color: '9CA3AF'
+    });
+
+    const kpis = [
+      { label: "TOTAL FOLLOWERS", val: brand?.followers?.formatted || '0', color: '10B981', x: 0.8 },
+      { label: "TOTAL VIEWS", val: metricsData.totalViews.toLocaleString('id-ID'), color: '38BDF8', x: 3.1 },
+      { label: "AVERAGE ER %", val: `${metricsData.averageER}%`, color: 'C084FC', x: 5.4 },
+      { label: "TOTAL SAVES", val: metricsData.totalSaves.toLocaleString('id-ID'), color: 'F59E0B', x: 7.7 }
+    ];
+
+    kpis.forEach(k => {
+      slide2.addShape(pptx.ShapeType.rect, {
+        x: k.x, y: 1.5, w: 2.1, h: 2.0,
+        fill: { color: '131D31' }, line: { color: '23334D', width: 1 }
+      });
+      slide2.addText(k.label, {
+        x: k.x, y: 1.7, w: 2.1, h: 0.3,
+        fontSize: 10, color: '9CA3AF', align: 'center', bold: true
+      });
+      slide2.addText(k.val, {
+        x: k.x, y: 2.1, w: 2.1, h: 0.8,
+        fontSize: 22, color: k.color, align: 'center', bold: true
+      });
+    });
+
+    // SLIDE 3: Top Performer Content (Rank 1 to 5)
+    const slide3 = pptx.addSlide();
+    slide3.background = { color: '0B0F19' };
+    slide3.addText("TOP PERFORMING CONTENT (WINNER CONTENT)", {
+      x: 0.8, y: 0.5, w: 8.4, h: 0.4,
+      fontSize: 22, color: '10B981', bold: true
+    });
+
+    const tableRows = [
+      [
+        { text: "No", options: { bold: true, fill: { color: '131D31' }, color: '10B981' } },
+        { text: "Judul / Hook Konten", options: { bold: true, fill: { color: '131D31' }, color: 'FFFFFF' } },
+        { text: "Platform", options: { bold: true, fill: { color: '131D31' }, color: 'FFFFFF' } },
+        { text: "Views", options: { bold: true, fill: { color: '131D31' }, color: '38BDF8' } },
+        { text: "ER (%)", options: { bold: true, fill: { color: '131D31' }, color: '10B981' } },
+        { text: "Saves", options: { bold: true, fill: { color: '131D31' }, color: 'F59E0B' } },
+        { text: "Link", options: { bold: true, fill: { color: '131D31' }, color: '38BDF8' } }
+      ]
+    ];
+
+    (metricsData.topByER || []).slice(0, 5).forEach((item, idx) => {
+      tableRows.push([
+        { text: `#${idx + 1}`, options: { color: '10B981', bold: true } },
+        { text: (item.template_name || '-').substring(0, 38), options: { color: 'FFFFFF' } },
+        { text: item.platform || 'TikTok', options: { color: '9CA3AF' } },
+        { text: (item.views || 0).toLocaleString('id-ID'), options: { color: 'FFFFFF' } },
+        { text: `${item.engagementRate}%`, options: { color: '10B981', bold: true } },
+        { text: (item.saves || 0).toLocaleString('id-ID'), options: { color: 'F59E0B' } },
+        { text: item.url ? '🔗 Link' : '-', options: { color: '38BDF8', hyperlink: item.url ? { url: item.url } : undefined } }
+      ]);
+    });
+
+    slide3.addTable(tableRows, {
+      x: 0.8, y: 1.2, w: 8.4,
+      fontSize: 10,
+      border: { pt: 1, color: '23334D' },
+      fill: { color: '111827' }
+    });
+
+    // SLIDE 4: Strategic Takeaways (Gemini AI)
+    const slide4 = pptx.addSlide();
+    slide4.background = { color: '0B0F19' };
+    slide4.addText("EXECUTIVE TAKEAWAYS & REKOMENDASI", {
+      x: 0.8, y: 0.5, w: 8.4, h: 0.4,
+      fontSize: 22, color: '10B981', bold: true
+    });
+    slide4.addText(narrative.overview || "Evaluasi performa konten menunjukkan pertumbuhan positif pada audience awareness dan conversion.", {
+      x: 0.8, y: 1.2, w: 8.4, h: 1.5,
+      fontSize: 12, color: 'D1D5DB'
+    });
+    slide4.addText("REKOMENDASI STRATEGI KONTEN BERIKUTNYA:", {
+      x: 0.8, y: 2.9, w: 8.4, h: 0.3,
+      fontSize: 14, color: '10B981', bold: true
+    });
+    slide4.addText(narrative.conclusion || "1. Perbanyak format hook edukatif dan problem-solution.\n2. Tingkatkan CTA untuk shares & bookmarks.", {
+      x: 0.8, y: 3.3, w: 8.4, h: 1.6,
+      fontSize: 12, color: '9CA3AF'
+    });
+
+    const fileName = `Laporan_Kinerja_${brandName.replace(/\s+/g, '_')}_${period.replace(/\s+/g, '_')}.pptx`;
+    pptx.writeFile({ fileName });
+  } catch (e) {
+    console.error("PPTX export error:", e);
+    const htmlContent = generatePPTSlidesHTML(brandName, period, metricsData, narrative);
+    const win = window.open("", "_blank");
+    win.document.write(htmlContent);
+    win.document.close();
+  }
 }
 
 function generatePPTSlidesHTML(brandName, period, metricsData, narrative) {
@@ -716,6 +994,15 @@ function closeModal() {
   if (container) container.classList.add("hidden");
 }
 
+function getGeminiModelLabel(model) {
+  if (model === "gemini-2.5-flash") return "Gemini 2.5 Flash";
+  if (model === "gemini-2.5-pro") return "Gemini 2.5 Pro";
+  if (model === "gemini-2.0-flash") return "Gemini 2.0 Flash";
+  if (model === "gemini-1.5-pro") return "Gemini 1.5 Pro";
+  if (model === "gemini-1.5-flash") return "Gemini 1.5 Flash";
+  return model || "Gemini 2.5 Flash";
+}
+
 function updateGeminiStatusUI() {
   const key = GEMINI_CONFIG.getApiKey();
   const model = GEMINI_CONFIG.getModel();
@@ -725,7 +1012,7 @@ function updateGeminiStatusUI() {
   const sidebarBadge = document.getElementById("sidebar-gemini-status-badge");
   const settingsStatus = document.getElementById("settings-conn-status");
 
-  const modelLabel = model === "gemini-1.5-pro" ? "Gemini 1.5 Pro" : model === "gemini-2.0-flash" ? "Gemini 2.0 Flash" : "Gemini 1.5 Flash";
+  const modelLabel = getGeminiModelLabel(model);
 
   if (kpiModel) kpiModel.textContent = modelLabel;
 
@@ -747,12 +1034,21 @@ function renderSidebarBrands() {
   if (!brandListContainer) return;
 
   brandListContainer.innerHTML = brandsStore.map(b => `
-    <div class="brand-item ${b.id === activeBrandId ? 'active' : ''}" data-brand-id="${b.id}">
-      <div class="brand-info">
-        <div class="brand-badge" style="background:${b.logoBg};">${b.name.substring(0, 2).toUpperCase()}</div>
-        <div class="brand-name">${b.name}</div>
+    <div class="brand-item ${b.id === activeBrandId ? 'active' : ''}" data-brand-id="${b.id}" style="padding: 7px 10px;">
+      <div class="brand-info" style="gap: 8px;">
+        <div class="brand-badge" style="background:${b.logoBg}; width: 26px; height: 26px; font-size: 11px; font-weight: 800;">
+          ${b.name.substring(0, 2).toUpperCase()}
+        </div>
+        <div style="min-width: 0;">
+          <div class="brand-name" style="font-size: 13px; line-height: 1.2; font-weight: 600;">${b.name}</div>
+          <div style="font-size: 10px; color: var(--text-muted); margin-top: 2px; display: flex; align-items: center; gap: 4px;">
+            <span style="color: var(--accent-emerald); font-weight: 700;">👥 ${b.followers?.formatted || '0'}</span>
+            <span>•</span>
+            <span style="max-width: 85px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${b.handle || '@brand'}</span>
+          </div>
+        </div>
       </div>
-      <span class="nav-status status-${b.status.report}">${b.status.report === 'narrative_review' ? 'Review' : b.status.report}</span>
+      <span class="nav-status status-${b.status.report}" style="font-size: 10px; padding: 2px 6px;">${b.status.report === 'narrative_review' ? 'Review' : b.status.report}</span>
     </div>
   `).join('');
 
@@ -772,9 +1068,16 @@ async function updateBrandContext() {
 
   const bannerName = document.getElementById("active-brand-name");
   const bannerBadge = document.getElementById("active-brand-badge");
+  const bannerHandle = document.getElementById("active-brand-handle");
+  const bannerFollowers = document.getElementById("active-brand-followers-badge");
 
   if (bannerName) bannerName.textContent = brand.name;
-  if (bannerBadge) bannerBadge.style.backgroundColor = brand.logoBg;
+  if (bannerBadge) {
+    bannerBadge.style.backgroundColor = brand.logoBg;
+    bannerBadge.textContent = brand.name.substring(0, 2).toUpperCase();
+  }
+  if (bannerHandle) bannerHandle.textContent = brand.handle || `@${brand.name.toLowerCase().replace(/\s+/g, '')}`;
+  if (bannerFollowers) bannerFollowers.textContent = `👥 ${brand.followers?.formatted || '0'} Followers`;
 
   const briefBrandInput = document.getElementById("brief-brand-name");
   if (briefBrandInput) briefBrandInput.value = brand.name;
@@ -811,6 +1114,31 @@ function switchScreen(screenName) {
   const activeEl = document.getElementById(`screen-${screenName}`);
   if (activeEl) activeEl.classList.remove("hidden");
 
+  // Dynamic Top Bar Titles
+  const titleEl = document.getElementById("top-bar-title");
+  const subEl = document.getElementById("top-bar-subtitle");
+  if (titleEl && subEl) {
+    if (screenName === "dashboard") {
+      titleEl.textContent = "Dashboard Overview";
+      subEl.textContent = "Multi-Brand Marketing & Content Strategist Platform";
+    } else if (screenName === "brief") {
+      titleEl.textContent = "Brief Intake";
+      subEl.textContent = "Input, tempel, atau ekstrak brief client dengan Gemini 2.5";
+    } else if (screenName === "strategy") {
+      titleEl.textContent = "Strategi Brand";
+      subEl.textContent = "Analisis SWOT, Riset Kompetitor, dan Segmentasi Persona";
+    } else if (screenName === "content") {
+      titleEl.textContent = "Kalender Konten 30 Hari";
+      subEl.textContent = "Breakdown jadwal, angle copywriting, dan visual konsep";
+    } else if (screenName === "report") {
+      titleEl.textContent = "Laporan Kinerja";
+      subEl.textContent = "Agregasi metrik performa & Export Excel / PPT";
+    } else if (screenName === "settings") {
+      titleEl.textContent = "Pengaturan Gemini API";
+      subEl.textContent = "Konfigurasi API Key & Pilihan Model AI";
+    }
+  }
+
   renderCurrentScreen();
 }
 
@@ -832,70 +1160,100 @@ function renderDashboard() {
   const brandGrid = document.getElementById("dashboard-brand-grid");
   if (!brandGrid) return;
 
-  brandGrid.innerHTML = brandsStore.map(b => `
+  brandGrid.innerHTML = brandsStore.map(b => {
+    const accountsHtml = (b.followers?.accounts || []).map(acc => `
+      <span style="display: inline-flex; align-items: center; gap: 4px; font-size: 11px; background: var(--bg-input); padding: 3px 8px; border-radius: 4px; border: 1px solid var(--border-subtle);">
+        <span>${acc.icon || '📱'}</span>
+        <span style="color: var(--text-secondary);">${acc.platform}:</span>
+        <strong style="color: var(--text-main);">${acc.followers || (acc.current ? acc.current.toLocaleString('id-ID') : '0')}</strong>
+        <span style="color: var(--accent-emerald); font-size: 10px; font-weight: 600;">(${acc.growthPct || '+0%'})</span>
+      </span>
+    `).join('');
+
+    return `
     <div class="glass-card" style="margin-bottom: 0;">
-      <div class="card-header-title">
-        <div style="display: flex; align-items: center; gap: 12px;">
-          <div class="brand-badge" style="background:${b.logoBg}; width: 36px; height: 36px; font-size: 14px;">
+      <div class="card-header-title" style="margin-bottom: 12px;">
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <div class="brand-badge" style="background:${b.logoBg}; width: 34px; height: 34px; font-size: 13px; font-weight: 800;">
             ${b.name.substring(0, 2).toUpperCase()}
           </div>
           <div>
-            <h4 style="font-size: 16px; font-weight: 700;">${b.name}</h4>
-            <p style="font-size: 12px; color: var(--text-muted);">${b.industry}</p>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <h4 style="font-size: 15px; font-weight: 700;">${b.name}</h4>
+              <span style="font-size: 11px; color: var(--text-muted); font-family: var(--font-mono);">${b.handle || ''}</span>
+            </div>
+            <p style="font-size: 12px; color: var(--text-secondary);">${b.industry}</p>
           </div>
         </div>
-        <button class="btn btn-secondary btn-select-brand" data-id="${b.id}" style="padding: 6px 12px; font-size: 12px;">
-          Kelola Brand
+        <button class="btn btn-secondary btn-select-brand" data-id="${b.id}" style="padding: 5px 10px; font-size: 12px;">
+          📝 Input / Buka Brief →
         </button>
       </div>
 
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-top: 16px;">
-        <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 10px; color: var(--text-dim);">BRIEF</div>
-          <div class="badge-pill status-${b.status.brief}" style="margin-top: 4px;">${b.status.brief}</div>
+      <!-- Followers Summary Strip -->
+      <div style="background: var(--bg-app); padding: 10px 12px; border-radius: 8px; border: 1px solid var(--border-subtle); margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">👥 TOTAL FOLLOWERS HANDLED</span>
+          <span style="font-size: 13px; font-weight: 800; color: var(--accent-emerald);">
+            ${b.followers?.formatted || '0'} 
+            <span style="font-size: 11px; color: var(--text-muted); font-weight: 500;">(${b.followers?.growth || '+0'} bln ini)</span>
+          </span>
         </div>
-        <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 10px; color: var(--text-dim);">STRATEGY</div>
-          <div class="badge-pill status-${b.status.strategy}" style="margin-top: 4px;">${b.status.strategy}</div>
+        <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+          ${accountsHtml || '<span style="font-size: 11px; color: var(--text-muted);">Belum ada akun terhubung</span>'}
         </div>
-        <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 10px; color: var(--text-dim);">CONTENT</div>
-          <div class="badge-pill status-${b.status.content}" style="margin-top: 4px;">${b.status.content}</div>
+      </div>
+
+      <!-- Status Pills -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px;">
+        <div style="background: var(--bg-app); padding: 6px; border-radius: 6px; text-align: center; border: 1px solid var(--border-subtle);">
+          <div style="font-size: 9px; color: var(--text-muted); font-weight: 600;">BRIEF</div>
+          <div class="badge-pill status-${b.status.brief}" style="margin-top: 2px; font-size: 10px;">${b.status.brief}</div>
         </div>
-        <div style="background: rgba(255,255,255,0.03); padding: 8px; border-radius: 8px; text-align: center;">
-          <div style="font-size: 10px; color: var(--text-dim);">REPORT</div>
-          <div class="badge-pill status-${b.status.report}" style="margin-top: 4px;">${b.status.report}</div>
+        <div style="background: var(--bg-app); padding: 6px; border-radius: 6px; text-align: center; border: 1px solid var(--border-subtle);">
+          <div style="font-size: 9px; color: var(--text-muted); font-weight: 600;">STRATEGY</div>
+          <div class="badge-pill status-${b.status.strategy}" style="margin-top: 2px; font-size: 10px;">${b.status.strategy}</div>
+        </div>
+        <div style="background: var(--bg-app); padding: 6px; border-radius: 6px; text-align: center; border: 1px solid var(--border-subtle);">
+          <div style="font-size: 9px; color: var(--text-muted); font-weight: 600;">CONTENT</div>
+          <div class="badge-pill status-${b.status.content}" style="margin-top: 2px; font-size: 10px;">${b.status.content}</div>
+        </div>
+        <div style="background: var(--bg-app); padding: 6px; border-radius: 6px; text-align: center; border: 1px solid var(--border-subtle);">
+          <div style="font-size: 9px; color: var(--text-muted); font-weight: 600;">REPORT</div>
+          <div class="badge-pill status-${b.status.report}" style="margin-top: 2px; font-size: 10px;">${b.status.report}</div>
         </div>
       </div>
     </div>
-  `).join('');
+  `;}).join('');
 
   document.querySelectorAll(".btn-select-brand").forEach(btn => {
     btn.addEventListener("click", () => {
       activeBrandId = btn.getAttribute("data-id");
       renderSidebarBrands();
       updateBrandContext();
-      switchScreen("report");
+      switchScreen("brief");
     });
   });
 }
 
 // SCREEN 2: BRIEF INTAKE
 function renderBriefScreen(brand) {
+  const brandNameInput = document.getElementById("brief-brand-name");
   const goalsInput = document.getElementById("brief-goals");
   const problemInput = document.getElementById("brief-problem");
   const audienceInput = document.getElementById("brief-audience");
   const pkContainer = document.getElementById("brief-product-knowledge");
 
+  if (brandNameInput && brand) brandNameInput.value = brand.name;
   if (goalsInput) goalsInput.value = MOCK_BRIEF.goals;
   if (problemInput) problemInput.value = MOCK_BRIEF.problem_statement;
   if (audienceInput) audienceInput.value = MOCK_BRIEF.target_audience;
 
-  if (pkContainer) {
+  if (pkContainer && MOCK_BRIEF.product_knowledge) {
     pkContainer.innerHTML = MOCK_BRIEF.product_knowledge.map(pk => `
-      <div style="background: rgba(255,255,255,0.04); padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; font-size: 13px; display: flex; align-items: center; justify-content: space-between;">
+      <div style="background: var(--bg-input); padding: 8px 12px; border-radius: 6px; margin-bottom: 6px; font-size: 13px; display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border-subtle);">
         <span>✨ ${pk}</span>
-        <span style="color: var(--accent-green);">✓ Verified by Gemini</span>
+        <span style="color: var(--accent-emerald); font-size: 11px; font-weight: 600;">✓ Verified</span>
       </div>
     `).join('');
   }
@@ -1023,49 +1381,154 @@ function renderReportScreen(brand) {
   const totalSharesEl = document.getElementById("rep-total-shares");
   const totalPostsEl = document.getElementById("rep-total-posts");
 
+  const brandFollowers = brand.followers || { total: 0, formatted: "0", growth: "+0", growthPct: "0%", accounts: [] };
+  const repFollowersEl = document.getElementById("rep-total-followers");
+  const repGrowthSubEl = document.getElementById("rep-follower-growth-sub");
+  const repAccBadge = document.getElementById("rep-account-count-badge");
+
+  if (repFollowersEl) repFollowersEl.textContent = brandFollowers.formatted;
+  if (repGrowthSubEl) repGrowthSubEl.textContent = `${brandFollowers.growth} (${brandFollowers.growthPct}) bln ini`;
+  if (repAccBadge) repAccBadge.textContent = `${brandFollowers.accounts?.length || 0} Akun Aktif`;
+
   if (totalViewsEl) totalViewsEl.textContent = currentMetrics.totalViews.toLocaleString('id-ID');
   if (avgErEl) avgErEl.textContent = `${currentMetrics.averageER}%`;
   if (totalSavesEl) totalSavesEl.textContent = currentMetrics.totalSaves.toLocaleString('id-ID');
   if (totalSharesEl) totalSharesEl.textContent = (currentMetrics.totalShares || 0).toLocaleString('id-ID');
   if (totalPostsEl) totalPostsEl.textContent = currentMetrics.totalPosts;
 
+  // 1. TOP ER TABLE
   const topErBody = document.getElementById("table-top-er");
   if (topErBody) {
     topErBody.innerHTML = currentMetrics.topByER.map((item, idx) => `
       <tr>
-        <td><strong style="color: var(--accent-green);">#${idx + 1}</strong></td>
-        <td><strong>${item.template_name}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${item.platform} | ${item.type}</span></td>
+        <td><strong style="color: var(--accent-emerald);">#${idx + 1}</strong></td>
+        <td>
+          <strong>${item.template_name}</strong><br/>
+          <span style="font-size:11px; color:var(--text-muted);">${item.platform} | ${item.type}</span>
+          ${item.url ? `<a href="${item.url}" target="_blank" style="margin-left: 6px; font-size: 10px; color: var(--accent-blue);">🔗 Buka</a>` : ''}
+        </td>
         <td><span class="badge-pill badge-green">${item.engagementRate}%</span></td>
-        <td>${item.saves}</td>
-        <td><span class="badge-pill badge-purple">${item.shares || 0}</span></td>
+        <td>${(item.saves || 0).toLocaleString('id-ID')}</td>
+        <td><span class="badge-pill badge-purple">${(item.shares || 0).toLocaleString('id-ID')}</span></td>
       </tr>
     `).join('');
   }
 
+  // 2. TOP VIEWS TABLE
   const topViewsBody = document.getElementById("table-top-views");
   if (topViewsBody) {
     topViewsBody.innerHTML = currentMetrics.topByViews.map((item, idx) => `
       <tr>
         <td><strong style="color: var(--accent-blue);">#${idx + 1}</strong></td>
-        <td><strong>${item.template_name}</strong><br/><span style="font-size:11px; color:var(--text-muted);">${item.platform} | ${item.type}</span></td>
-        <td><strong>${item.views.toLocaleString('id-ID')}</strong></td>
-        <td>${item.likes}</td>
+        <td>
+          <strong>${item.template_name}</strong><br/>
+          <span style="font-size:11px; color:var(--text-muted);">${item.platform} | ${item.type}</span>
+          ${item.url ? `<a href="${item.url}" target="_blank" style="margin-left: 6px; font-size: 10px; color: var(--accent-blue);">🔗 Buka</a>` : ''}
+        </td>
+        <td><strong>${(item.views || 0).toLocaleString('id-ID')}</strong></td>
+        <td>${(item.likes || 0).toLocaleString('id-ID')}</td>
         <td><span class="badge-pill badge-blue">${item.engagementRate}%</span></td>
       </tr>
     `).join('');
   }
 
+  // 3. HANDLED ACCOUNTS TABLE
   const followerBody = document.getElementById("table-follower-growth");
   if (followerBody) {
-    followerBody.innerHTML = currentMetrics.followerGrowth.map(fg => `
-      <tr>
-        <td><strong>@${fg.account}</strong> (${fg.platform})</td>
-        <td>${fg.previous.toLocaleString('id-ID')}</td>
-        <td>${fg.current.toLocaleString('id-ID')}</td>
-        <td style="color: var(--accent-green); font-weight:700;">+${fg.delta.toLocaleString('id-ID')}</td>
-        <td><span class="badge-pill badge-green">+${fg.percentage}%</span></td>
-      </tr>
-    `).join('');
+    if (brandFollowers.accounts && brandFollowers.accounts.length > 0) {
+      followerBody.innerHTML = brandFollowers.accounts.map((acc, accIdx) => `
+        <tr>
+          <td><span style="font-size: 14px; margin-right: 6px;">${acc.icon || '📱'}</span><strong>${acc.platform}</strong></td>
+          <td><span style="font-family: var(--font-mono); font-weight: 600; color: var(--accent-blue);">${acc.handle}</span></td>
+          <td>${(acc.start || 0).toLocaleString('id-ID')}</td>
+          <td><strong style="color: var(--text-main);">${(acc.current || 0).toLocaleString('id-ID')}</strong></td>
+          <td><span style="color: var(--accent-emerald); font-weight: 700;">${acc.growth}</span></td>
+          <td><span class="badge-pill badge-green">${acc.growthPct}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-delete-account" data-idx="${accIdx}" style="padding: 2px 6px; font-size: 11px; color: var(--accent-red);" title="Hapus Akun">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll(".btn-delete-account").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = parseInt(btn.getAttribute("data-idx"), 10);
+          if (confirm(`Hapus akun ${brandFollowers.accounts[idx]?.handle} dari monitoring brand ini?`)) {
+            brandFollowers.accounts.splice(idx, 1);
+            let total = 0;
+            brandFollowers.accounts.forEach(a => total += (a.current || 0));
+            brandFollowers.total = total;
+            brandFollowers.formatted = total >= 1000000 ? (total/1000000).toFixed(1) + 'M' : total >= 1000 ? (total/1000).toFixed(1) + 'K' : total.toString();
+            renderReportScreen(brand);
+            renderSidebarBrands();
+            updateBrandContext();
+            showToast("Akun berhasil dihapus dari tracking.", "🗑️");
+          }
+        });
+      });
+    } else {
+      followerBody.innerHTML = `
+        <tr>
+          <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 20px;">
+            Belum ada akun media sosial yang ditautkan untuk brand ini. Klik "➕ Tambah Akun Target" di atas untuk menambahkan.
+          </td>
+        </tr>
+      `;
+    }
+  }
+
+  // 4. MASTER CONTENT MONITORING TABLE (FOR EXCEL & PPT EXPORT)
+  const masterContentBody = document.getElementById("table-all-scraped-posts");
+  if (masterContentBody) {
+    if (currentPosts && currentPosts.length > 0) {
+      masterContentBody.innerHTML = currentPosts.map((p, idx) => `
+        <tr>
+          <td><strong style="color: var(--text-muted); font-size: 11px;">#${idx + 1}</strong></td>
+          <td>
+            <span style="font-size: 11px; background: var(--bg-input); padding: 2px 6px; border-radius: 4px; border: 1px solid var(--border-subtle);">
+              ${p.platform || 'TikTok'} • <strong>${p.account_username || p.account || brand.handle || ''}</strong>
+            </span>
+          </td>
+          <td>
+            <strong style="font-size: 12px; color: var(--text-main);">${p.template_name || p.title || 'Konten #' + (idx+1)}</strong>
+          </td>
+          <td>
+            ${p.url ? `<a href="${p.url}" target="_blank" style="font-size: 11px; color: var(--accent-blue); text-decoration: underline; font-family: var(--font-mono); max-width: 140px; display: inline-block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">🔗 ${p.url}</a>` : '<span style="color: var(--text-muted); font-size: 11px;">-</span>'}
+          </td>
+          <td><strong>${(p.views || 0).toLocaleString('id-ID')}</strong></td>
+          <td><span class="badge-pill badge-green">${p.engagementRate}%</span></td>
+          <td>${(p.likes || 0).toLocaleString('id-ID')}</td>
+          <td>${(p.comments || 0).toLocaleString('id-ID')}</td>
+          <td><span style="color: var(--accent-amber); font-weight: 600;">${(p.saves || 0).toLocaleString('id-ID')}</span></td>
+          <td><span style="color: var(--accent-purple); font-weight: 600;">${(p.shares || 0).toLocaleString('id-ID')}</span></td>
+          <td>
+            <button class="btn btn-ghost btn-delete-post" data-idx="${idx}" style="padding: 2px 6px; font-size: 11px; color: var(--accent-red);" title="Hapus Konten">
+              🗑️
+            </button>
+          </td>
+        </tr>
+      `).join('');
+
+      document.querySelectorAll(".btn-delete-post").forEach(btn => {
+        btn.addEventListener("click", () => {
+          const idx = parseInt(btn.getAttribute("data-idx"), 10);
+          currentPosts.splice(idx, 1);
+          currentMetrics = aggregateMetrics(currentPosts, currentFollowerSnapshots);
+          renderReportScreen(brand);
+          showToast("Konten dihapus dari database.", "🗑️");
+        });
+      });
+    } else {
+      masterContentBody.innerHTML = `
+        <tr>
+          <td colspan="11" style="text-align: center; color: var(--text-muted); padding: 24px;">
+            Belum ada data konten. Gunakan "➕ Tambah Link Konten Baru" atau "📥 Import File CSV" di atas.
+          </td>
+        </tr>
+      `;
+    }
   }
 
   const overviewInput = document.getElementById("narrative-overview-text");
@@ -1075,54 +1538,30 @@ function renderReportScreen(brand) {
   if (conclusionInput) conclusionInput.value = currentNarrative.conclusion;
 }
 
-// SCREEN 6: SETTINGS SCREEN
-function renderSettingsScreen() {
-  const inputKey = document.getElementById("settings-input-key");
-  const selectModel = document.getElementById("settings-select-model");
-  const selectTemp = document.getElementById("settings-select-temp");
-
-  if (inputKey) inputKey.value = GEMINI_CONFIG.getApiKey();
-  if (selectModel) selectModel.value = GEMINI_CONFIG.getModel();
-  if (selectTemp) selectTemp.value = GEMINI_CONFIG.getTemperature().toString();
-
-  updateGeminiStatusUI();
-}
-
 // SETUP EVENT LISTENERS
 function setupEventListeners() {
-  // Navigation & Settings Listeners
-  const toggleVisibility = document.getElementById("toggle-key-visibility");
-  if (toggleVisibility) {
-    toggleVisibility.addEventListener("click", () => {
-      const input = document.getElementById("settings-input-key");
-      if (input) {
-        if (input.type === "password") {
-          input.type = "text";
-          toggleVisibility.textContent = "🔒 Sembunyikan";
-        } else {
-          input.type = "password";
-          toggleVisibility.textContent = "👁️ Lihat";
-        }
-      }
-    });
-  }
-
-  // Settings: Test Connection Button
+  // Test Gemini API Button
   const settingsBtnTest = document.getElementById("settings-btn-test");
   if (settingsBtnTest) {
     settingsBtnTest.addEventListener("click", async () => {
       const key = document.getElementById("settings-input-key").value.trim();
-      const model = document.getElementById("settings-select-model").value;
+      const selectModelEl = document.getElementById("settings-select-model");
+      let model = selectModelEl ? selectModelEl.value : "gemini-2.5-flash";
+      if (model === "custom") {
+        model = document.getElementById("settings-input-custom-model")?.value.trim() || "gemini-2.5-flash";
+      }
 
       if (!key) {
-        alert("Silakan masukkan Google Gemini API key terlebih dahulu!");
+        alert("Masukkan Gemini API Key terlebih dahulu.");
         return;
       }
 
-      showToast("Menguji koneksi ke Google Gemini API...", "🔄");
+      showToast(`Menguji koneksi ke Gemini API (${model})...`, "⏳");
+      const startTime = Date.now();
+
       try {
-        const startTime = Date.now();
-        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`, {
+        const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
+        const res = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -1133,15 +1572,15 @@ function setupEventListeners() {
         const latency = Date.now() - startTime;
 
         if (res.ok) {
-          showToast(`Koneksi Google Gemini Sukses 100%! (${latency}ms) 🚀`, "✅");
+          showToast(`Koneksi ${model} Sukses 100%! (${latency}ms) 🚀`, "✅");
           const settingsStatus = document.getElementById("settings-conn-status");
           if (settingsStatus) {
-            settingsStatus.textContent = `🟢 Terkoneksi (${latency}ms)`;
+            settingsStatus.textContent = `🟢 Terkoneksi (${model} - ${latency}ms)`;
             settingsStatus.className = "badge-pill badge-green";
           }
         } else {
           const err = await res.json().catch(() => ({}));
-          alert(`Gagal koneksi API: ${err.error?.message || res.statusText}`);
+          alert(`Gagal koneksi API (${model}): ${err.error?.message || res.statusText}`);
         }
       } catch (e) {
         alert(`Error koneksi API: ${e.message}`);
@@ -1154,7 +1593,11 @@ function setupEventListeners() {
   if (settingsBtnSave) {
     settingsBtnSave.addEventListener("click", () => {
       const key = document.getElementById("settings-input-key").value.trim();
-      const model = document.getElementById("settings-select-model").value;
+      const selectModelEl = document.getElementById("settings-select-model");
+      let model = selectModelEl ? selectModelEl.value : "gemini-2.5-flash";
+      if (model === "custom") {
+        model = document.getElementById("settings-input-custom-model")?.value.trim() || "gemini-2.5-flash";
+      }
       const temp = document.getElementById("settings-select-temp").value;
 
       GEMINI_CONFIG.setApiKey(key);
@@ -1162,252 +1605,141 @@ function setupEventListeners() {
       GEMINI_CONFIG.setTemperature(temp);
 
       updateGeminiStatusUI();
-      showToast("Pengaturan Gemini API berhasil disimpan secara lokal!", "✅");
+      showToast(`Pengaturan Gemini (${model}) berhasil disimpan!`, "✅");
     });
   }
 
-  // Settings: Clear Key Button
-  const settingsBtnClear = document.getElementById("settings-btn-clear");
-  if (settingsBtnClear) {
-    settingsBtnClear.addEventListener("click", () => {
-      if (confirm("Apakah kamu yakin ingin menghapus API key dari browser?")) {
-        GEMINI_CONFIG.setApiKey("");
-        const inputKey = document.getElementById("settings-input-key");
-        if (inputKey) inputKey.value = "";
-        updateGeminiStatusUI();
-        showToast("Kunci API berhasil dihapus.", "🗑️");
-      }
-    });
-  }
-
-  const addBrandBtn = document.getElementById("btn-add-brand-modal");
-  if (addBrandBtn) {
-    addBrandBtn.addEventListener("click", () => {
-      const brandName = prompt("Masukkan Nama Brand Baru (misal: Anker / Samsung / Brand Client Baru):");
-      if (brandName && brandName.trim()) {
-        const newBrand = {
-          id: `b_${Date.now()}`,
-          name: brandName.trim(),
-          industry: "General Marketing & Content",
-          logoBg: "#" + Math.floor(Math.random()*16777215).toString(16),
-          guidelines: { banned_terms: [], hashtag_pillars: [], no_dash: true },
-          status: { brief: "draft", strategy: "draft", content: "draft", report: "draft" }
-        };
-        brandsStore.push(newBrand);
-        activeBrandId = newBrand.id;
-        renderSidebarBrands();
-        updateBrandContext();
-        showToast(`Brand ${newBrand.name} berhasil ditambahkan!`, "🏢");
-      }
-    });
-  }
-
-  // AI Extract Brief with Gemini
-  document.getElementById("btn-ai-extract-brief")?.addEventListener("click", async () => {
-    const brand = getActiveBrand();
-    showToast("Gemini AI sedang mengekstrak poin penting brief...", "✨");
-    const extracted = await extractBriefWithGemini("Brief kampanye awareness produk baru", brand.name);
-    MOCK_BRIEF.goals = extracted.goals;
-    MOCK_BRIEF.problem_statement = extracted.problem_statement;
-    MOCK_BRIEF.target_audience = extracted.target_audience;
-    MOCK_BRIEF.product_knowledge = extracted.product_knowledge || [];
-    renderBriefScreen(brand);
-    showToast("Brief berhasil diekstrak otomatis oleh Gemini AI!", "✅");
-  });
-
-  const confirmBriefBtn = document.getElementById("btn-confirm-brief");
-  if (confirmBriefBtn) {
-    confirmBriefBtn.addEventListener("click", () => {
+  // ADD TARGET ACCOUNT (CHANNEL MONITORING)
+  const addTargetAccountBtn = document.getElementById("btn-add-target-account");
+  if (addTargetAccountBtn) {
+    addTargetAccountBtn.addEventListener("click", () => {
       const brand = getActiveBrand();
-      brand.status.brief = "confirmed";
-      renderSidebarBrands();
-      showToast("Brief berhasil di-confirm & Layer Strategy kini aktif!", "✅");
-    });
-  }
+      const platform = prompt("Pilih Platform Akun (TikTok / Instagram / YouTube):", "TikTok") || "TikTok";
+      const handle = prompt(`Masukkan handle akun ${platform} (misal: @${brand.name.toLowerCase().replace(/\s+/g, '')}):`, `@${brand.name.toLowerCase().replace(/\s+/g, '')}`);
+      if (!handle) return;
 
-  // Auto Generate SWOT with Gemini
-  document.getElementById("btn-ai-generate-swot")?.addEventListener("click", async () => {
-    const brand = getActiveBrand();
-    showToast(`Gemini AI sedang merumuskan analisis SWOT untuk ${brand.name}...`, "✨");
-    const swot = await generateSWOTWithGemini(brand.name, brand.industry);
-    MOCK_SWOT.strengths = swot.strengths;
-    MOCK_SWOT.weaknesses = swot.weaknesses;
-    MOCK_SWOT.opportunities = swot.opportunities;
-    MOCK_SWOT.threats = swot.threats;
-    renderStrategyScreen(brand);
-    showToast("Analisis SWOT berhasil diperbarui oleh Gemini AI!", "🚀");
-  });
+      const startFollowersStr = prompt(`Followers Awal Bulan untuk ${handle}:`, "50000") || "50000";
+      const currentFollowersStr = prompt(`Followers Terkini untuk ${handle}:`, "58200") || "58200";
 
-  // Research Competitor with Gemini
-  const aiCompetitorBtn = document.getElementById("btn-ai-competitor");
-  if (aiCompetitorBtn) {
-    aiCompetitorBtn.addEventListener("click", () => {
-      showToast("Gemini Competitor Research Agent sedang menganalisis pasar...", "🤖");
-      setTimeout(() => {
-        MOCK_SWOT.competitors.push({
-          name: "Baseus Official",
-          positioning: "Kompetitor langsung di marketplace dengan visual aesthetic & variasi warna banyak"
-        });
-        const brand = getActiveBrand();
-        renderStrategyScreen(brand);
-        showToast("Insight kompetitor baru berhasil ditambahkan oleh Gemini!", "✨");
-      }, 1000);
-    });
-  }
+      const start = parseInt(startFollowersStr.replace(/[^0-9]/g, ''), 10) || 0;
+      const current = parseInt(currentFollowersStr.replace(/[^0-9]/g, ''), 10) || start;
+      const delta = current - start;
+      const pct = start > 0 ? ((delta / start) * 100).toFixed(1) : "0.0";
+      const icon = platform.toLowerCase().includes("tiktok") ? "📱" : platform.toLowerCase().includes("insta") ? "📸" : "▶️";
 
-  // Auto Generate Personas with Gemini
-  document.getElementById("btn-ai-generate-personas")?.addEventListener("click", () => {
-    const brand = getActiveBrand();
-    showToast("Gemini AI sedang merancang segmentasi persona audiens...", "✨");
-    setTimeout(() => {
-      MOCK_PERSONAS.push({
-        id: `p_${Date.now()}`,
-        name: "Remote Tech Enthusiast",
-        type: "Tech & Workstation",
-        target_qty: 10,
-        reasoning: "Fokus pada kecepatan charging & kemudahan mobilitas saat hybrid working."
-      });
-      renderStrategyScreen(brand);
-      showToast("Persona baru dirancang oleh Gemini AI!", "👥");
-    }, 800);
-  });
-
-  const addPersonaBtn = document.getElementById("btn-add-persona");
-  if (addPersonaBtn) {
-    addPersonaBtn.addEventListener("click", () => {
-      const name = prompt("Nama Persona Baru (misal: Executive Gamer):");
-      if (name) {
-        MOCK_PERSONAS.push({
-          id: `p_${Date.now()}`,
-          name: name,
-          type: "Niche Audience",
-          target_qty: 8,
-          reasoning: "Fokus pada aksesoris charging & hub untuk setup gaming."
-        });
-        const brand = getActiveBrand();
-        renderStrategyScreen(brand);
-        showToast(`Persona ${name} berhasil ditambahkan!`, "👥");
+      if (!brand.followers) {
+        brand.followers = { total: 0, formatted: "0", growth: "+0", growthPct: "+0%", accounts: [] };
       }
+
+      brand.followers.accounts.push({
+        platform: platform,
+        icon: icon,
+        handle: handle.startsWith("@") ? handle : `@${handle}`,
+        start: start,
+        current: current,
+        growth: delta >= 0 ? `+${(delta/1000).toFixed(1)}K` : `${(delta/1000).toFixed(1)}K`,
+        growthPct: delta >= 0 ? `+${pct}%` : `${pct}%`
+      });
+
+      let total = 0;
+      brand.followers.accounts.forEach(a => total += (a.current || 0));
+      brand.followers.total = total;
+      brand.followers.formatted = total >= 1000000 ? (total/1000000).toFixed(1) + 'M' : total >= 1000 ? (total/1000).toFixed(1) + 'K' : total.toString();
+
+      renderReportScreen(brand);
+      renderSidebarBrands();
+      updateBrandContext();
+      showToast(`Akun ${handle} (${platform}) berhasil ditambahkan ke tracking!`, "👥");
     });
   }
 
-  // Style Analyzer with Gemini
-  document.getElementById("btn-analyze-style")?.addEventListener("click", () => {
-    const url = document.getElementById("input-style-url")?.value || "";
-    showToast("Gemini Multimodal Agent sedang menganalisis style referensi konten...", "✨");
-    setTimeout(() => {
-      MOCK_STYLE_REF = {
-        url: url || "https://tiktok.com/@creator/video/1",
-        mood: "Modern Minimalist, Cinematic Warm Lighting, High Energy",
-        visual_style: "Dynamic angle panning, macro product close-up, clean ambient noise",
-        tone: "Persuasive, Energetic, Direct-to-consumer benefit focused"
+  // ADD CONTENT METRIC (INDIVIDUAL POST INGESTION)
+  const addContentMetricBtn = document.getElementById("btn-add-content-metric");
+  if (addContentMetricBtn) {
+    addContentMetricBtn.addEventListener("click", () => {
+      const brand = getActiveBrand();
+      const title = prompt("Judul / Hook Konten (misal: '3 Alasan Charger GaN Lebih Dingin'):");
+      if (!title) return;
+
+      const url = prompt("Link URL Konten (misal: https://tiktok.com/@ugreen.id/video/123):", "https://tiktok.com/@brand/video/1") || "";
+      const platform = prompt("Platform (TikTok / Instagram):", "TikTok") || "TikTok";
+      const viewsStr = prompt("Jumlah Views / Penayangan:", "45000") || "10000";
+      const likesStr = prompt("Jumlah Likes:", "3200") || "500";
+      const commentsStr = prompt("Jumlah Comments:", "180") || "50";
+      const savesStr = prompt("Jumlah Saves / Bookmarks:", "420") || "100";
+      const sharesStr = prompt("Jumlah Shares:", "150") || "50";
+
+      const views = parseInt(viewsStr.replace(/[^0-9]/g, ''), 10) || 1;
+      const likes = parseInt(likesStr.replace(/[^0-9]/g, ''), 10) || 0;
+      const comments = parseInt(commentsStr.replace(/[^0-9]/g, ''), 10) || 0;
+      const saves = parseInt(savesStr.replace(/[^0-9]/g, ''), 10) || 0;
+      const shares = parseInt(sharesStr.replace(/[^0-9]/g, ''), 10) || 0;
+
+      const er = (((likes + comments + saves + shares) / views) * 100).toFixed(2);
+
+      const newPost = {
+        template_name: title,
+        template_mode: "Manual Input",
+        platform: platform,
+        type: "Video",
+        account_username: brand.handle || "@brand",
+        views: views,
+        likes: likes,
+        comments: comments,
+        saves: saves,
+        shares: shares,
+        engagementRate: parseFloat(er),
+        url: url,
+        posted_at: new Date().toISOString().split('T')[0]
       };
-      const brand = getActiveBrand();
-      renderStrategyScreen(brand);
-      showToast("Style referensi berhasil dianalisis oleh Gemini!", "🎥");
-    }, 1000);
-  });
 
-  // 30-Day Hooks Breakdown with Gemini
-  const triggerBreakdownBtn = document.getElementById("btn-trigger-breakdown");
-  if (triggerBreakdownBtn) {
-    triggerBreakdownBtn.addEventListener("click", async () => {
-      const brand = getActiveBrand();
-      showToast("Gemini Content Breakdown Agent sedang merancang 30 hari content calendar...", "🤖");
-      const newHooks = await generate30DayHooksWithGemini(brand.name, MOCK_PERSONAS);
-      calendarHooksList = newHooks;
-      renderContentScreen(brand);
-      showToast("Breakdown 30 hari konten berhasil digenerate oleh Gemini AI!", "📅");
+      currentPosts.unshift(newPost);
+      currentMetrics = aggregateMetrics(currentPosts, currentFollowerSnapshots);
+      renderReportScreen(brand);
+      showToast(`Konten "${title}" berhasil ditambahkan ke database & kalkulasi!`, "📊");
     });
   }
 
-  const exportCopywriterBtn = document.getElementById("btn-export-copywriter");
-  if (exportCopywriterBtn) {
-    exportCopywriterBtn.addEventListener("click", () => {
+  // REGEN NARRATIVE INLINE
+  const regenNarrativeInlineBtn = document.getElementById("btn-regen-narrative-inline");
+  if (regenNarrativeInlineBtn) {
+    regenNarrativeInlineBtn.addEventListener("click", async () => {
       const brand = getActiveBrand();
-      let textContent = `CAK AI - COPYWRITING & EDITOR CONTENT BRIEF (${brand.name.toUpperCase()})\n\n`;
-      calendarHooksList.forEach(item => {
-        textContent += `[TANGGAL ${item.day} AUG] - ${item.title}\n`;
-        textContent += `Format: ${item.format} | Persona: ${item.persona}\n`;
-        textContent += `Visual Concept: ${item.concept}\n`;
-        textContent += `Copy Angle: ${item.copyAngle}\n\n`;
-      });
-
-      const blob = new Blob([textContent], { type: "text/plain;charset=utf-8" });
-      const link = document.createElement("a");
-      link.href = URL.createObjectURL(blob);
-      link.download = `Copywriting_Brief_${brand.name}_Agustus2026.txt`;
-      link.click();
-      showToast("Brief Copywriter & Editor berhasil di-export!", "📤");
-    });
-  }
-
-  const addSnapshotBtn = document.getElementById("btn-add-snapshot");
-  if (addSnapshotBtn) {
-    addSnapshotBtn.addEventListener("click", () => {
-      const newSnapshotCount = prompt("Masukkan Follower Snapshot Minggu Ini untuk @ugreen.id (TikTok):", "51200");
-      if (newSnapshotCount && !isNaN(newSnapshotCount)) {
-        currentFollowerSnapshots[0].week_1 = currentFollowerSnapshots[0].week_2;
-        currentFollowerSnapshots[0].week_2 = parseInt(newSnapshotCount, 10);
-
-        const brand = getActiveBrand();
-        currentMetrics = aggregateMetrics(currentPosts, currentFollowerSnapshots);
-        renderReportScreen(brand);
-        showToast("Snapshot follower berhasil diperbarui!", "📈");
-      }
-    });
-  }
-
-  const approveNarrativeBtn = document.getElementById("btn-approve-narrative");
-  if (approveNarrativeBtn) {
-    approveNarrativeBtn.addEventListener("click", () => {
-      const brand = getActiveBrand();
-      brand.status.report = "approved";
-      renderSidebarBrands();
-      showToast("Narasi Laporan disetujui & siap diexport!", "✅");
-    });
-  }
-
-  // Regenerate AI Narrative (Gemini)
-  const genNarrativeBtn = document.getElementById("btn-generate-narrative");
-  if (genNarrativeBtn) {
-    genNarrativeBtn.addEventListener("click", async () => {
-      const brand = getActiveBrand();
-      showToast("Gemini Report Narrative Agent sedang menyusun narasi performa...", "✨");
+      showToast("Gemini sedang memperbarui narasi eksekutif...", "✨");
       currentNarrative = await generateReportNarrative(brand.name, currentMetrics);
       renderReportScreen(brand);
-      showToast("Narasi Laporan berhasil digenerate oleh Gemini AI!", "🚀");
+      showToast("Narasi Eksekutif berhasil diperbarui oleh Gemini AI!", "🚀");
     });
   }
 
+  // 1. EXPORT TO EXCEL (.csv)
   const exportExcelBtn = document.getElementById("btn-export-excel");
   if (exportExcelBtn) {
     exportExcelBtn.addEventListener("click", () => {
       const brand = getActiveBrand();
       exportToExcel(brand.name, "Agustus 2026", currentMetrics, currentPosts);
-      showToast("Laporan Excel (.csv) berhasil di-download!", "📗");
+      showToast("Laporan Excel (.csv) dengan kolom No, Link, ER%, Views berhasil diunduh!", "📗");
     });
   }
 
+  // 2. EXPORT TO PPTX / PRESENTATION DECK
   const exportPptBtn = document.getElementById("btn-export-ppt");
   if (exportPptBtn) {
     exportPptBtn.addEventListener("click", () => {
       const brand = getActiveBrand();
-      const overviewText = document.getElementById("narrative-overview-text").value;
-      const conclusionText = document.getElementById("narrative-conclusion-text").value;
+      const overviewText = document.getElementById("narrative-overview-text")?.value || currentNarrative.overview;
+      const conclusionText = document.getElementById("narrative-conclusion-text")?.value || currentNarrative.conclusion;
 
-      const htmlContent = generatePPTSlidesHTML(brand.name, "Agustus 2026", currentMetrics, {
+      exportToPPTX(brand.name, "Agustus 2026", currentMetrics, {
         overview: overviewText,
         conclusion: conclusionText
-      });
+      }, brand);
 
-      const win = window.open("", "_blank");
-      win.document.write(htmlContent);
-      win.document.close();
-      showToast("PPT Presentation Deck berhasil digenerate!", "📙");
+      showToast("File Presentasi PPT (.pptx) berhasil digenerate!", "📙");
     });
   }
 
+  // CSV IMPORT
   const csvFileInput = document.getElementById("csv-file-input");
   if (csvFileInput) {
     csvFileInput.addEventListener("change", (e) => {
@@ -1421,7 +1753,7 @@ function setupEventListeners() {
           const brand = getActiveBrand();
           currentNarrative = await generateReportNarrative(brand.name, currentMetrics);
           renderReportScreen(brand);
-          showToast(`Berhasil mengimpor Raw Scrape CSV! (${currentPosts.length} konten diproses)`, "✅");
+          showToast(`Berhasil mengimpor Raw Data CSV! (${currentPosts.length} konten diproses)`, "✅");
         };
         reader.readAsText(file);
       }
@@ -1431,6 +1763,7 @@ function setupEventListeners() {
 
 // INITIALIZE ON DOM LOAD
 document.addEventListener("DOMContentLoaded", () => {
+  THEME_CONFIG.init();
   renderSidebarBrands();
   setupNavigation();
   setupEventListeners();
